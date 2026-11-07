@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pantalla de arranque: azul marino del fondo Aurora (tarea T144). Solo lleva el
+     color, sin imagen: enseguida Flutter muestra la presentación con el logo
+     (SplashScreen). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/launch_background" />
+</layer-list>

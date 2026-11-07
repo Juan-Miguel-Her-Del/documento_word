@@ -1,0 +1,47 @@
+# Despliegue de HandText AI en Render (Blueprint).
+#
+# Crea dos recursos en la misma región:
+# 1. handtext-db: PostgreSQL con las cuentas y sesiones (spec 002).
+# 2. handtext-api: la API FastAPI. Recibe la conexión a la base por la red interna de
+#    Render y aplica las migraciones de db/migrations cada vez que arranca (el ejecutor
+#    no repite las que ya aplicó).
+#
+# Secretos (constitución §2): la conexión a la base la genera Render y nunca se escribe
+# aquí. La clave de Google Cloud Vision se escribe en el panel de Render al crear el
+# Blueprint (sync: false).
+
+databases:
+  - name: handtext-db
+    databaseName: handtext
+    user: handtext
+    plan: free
+    region: virginia # la más cercana a Sudamérica
+    postgresMajorVersion: "17" # la misma versión que la base local
+
+services:
+  - type: web
+    name: handtext-api
+    runtime: python
+    plan: free
+    region: virginia # la misma de la base: así usan la red interna
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: >-
+      cd backend &&
+      python -m app.persistence.migrations &&
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
+    # Solo se vuelve a desplegar si cambian la API, la base o este archivo, no la app.
+    buildFilter:
+      paths:
+        - backend/**
+        - db/**
+        - render.yaml
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.2 # la misma del .venv local
+      - key: HANDTEXT_DATABASE_URL
+        fromDatabase:
+          name: handtext-db
+          property: connectionString
+      - key: HANDTEXT_GOOGLE_VISION_API_KEY
+        sync: false # Render la pide al crear el Blueprint

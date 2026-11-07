@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Colores nativos de Android (tarea T144; spec 002, research.md R9). -->
+<resources>
+    <!-- Azul marino del fondo Aurora (Aurora.backgroundTop en frontend/lib/theme/aurora.dart).
+         Se ve mientras la app arranca, para que no aparezca un destello blanco. -->
+    <color name="launch_background">#0B1220</color>
+    <!-- Fondo del ícono adaptable (tarea T146): azul corporativo, Aurora.blue. -->
+    <color name="ic_launcher_background">#2563EB</color>
+</resources>

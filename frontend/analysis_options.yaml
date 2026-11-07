@@ -1,0 +1,14 @@
+# Configuración del analizador de Dart (tarea T003).
+# Constitución §4: el código DEBE pasar el formateador (`dart format`) y este
+# analizador (`flutter analyze`) sin advertencias.
+
+# Reglas recomendadas para apps Flutter.
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Reglas adicionales que hacen el código más predecible.
+    prefer_single_quotes: true
+    prefer_final_locals: true
+    always_declare_return_types: true
+    unawaited_futures: true

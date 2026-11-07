@@ -1,0 +1,19 @@
+# Archivos que no se suben al repositorio (tarea T004).
+# La app Flutter tiene además su propio frontend/.gitignore (build/, .dart_tool/, etc.).
+
+# Python (backend)
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Secretos y configuración local: la clave de Google NUNCA va al repositorio
+# (constitución §2: credenciales por configuración externa).
+.env
+*.env
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/

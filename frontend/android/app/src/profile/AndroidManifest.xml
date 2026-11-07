@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Manifiesto solo para las compilaciones de perfil (`flutter run --profile`,
+         que mide el rendimiento). INTERNET la necesita la herramienta de Flutter
+         para conectarse a la app en ejecución y leer las mediciones. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+</manifest>

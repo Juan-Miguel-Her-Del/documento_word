@@ -1,0 +1,18 @@
+# Dependencias para desarrollar y probar la API (tarea T002).
+#   pytest -> ejecuta las pruebas automatizadas de backend/tests
+#   pypdf  -> lee los PDF generados para comprobar su texto en las pruebas
+#   ruff   -> formateador y analizador de estilo
+#   pgserver -> PostgreSQL embebido para probar la persistencia sin instalar nada (spec 002)
+-r requirements.txt
+colorama==0.4.6 ; sys_platform == "win32"
+fasteners==0.20
+iniconfig==2.3.1
+packaging==26.3
+pgserver==0.1.4
+platformdirs==4.13.6
+pluggy==1.7.0
+psutil==7.2.2
+Pygments==2.21.0
+pypdf==6.21.2
+pytest==9.1.1
+ruff==0.17.3

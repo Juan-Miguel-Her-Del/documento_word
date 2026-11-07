@@ -1,0 +1,21 @@
+# Archivos de Android que no se suben al repositorio.
+
+# Los generan Gradle y Flutter en cada computador (local.properties tiene sus rutas).
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+/build/
+# Informes de caídas de la JVM (falta de memoria al compilar).
+hs_err_pid*.log
+
+# Clave de firma de la versión final y sus contraseñas: NUNCA se suben ni se
+# comparten (spec 005; research.md de 005, R7). Con ellas, otra persona podría
+# publicar una versión falsa de la app.
+key.properties
+**/*.keystore
+**/*.jks

@@ -1,0 +1,10 @@
+<!--
+  Manifiesto SOLO para compilaciones de depuración (tarea T016; research.md, R12).
+  - INTERNET: la usa la herramienta de Flutter (recarga en caliente, depuración).
+  - HTTP sin cifrar para la API del computador (http://10.0.2.2:8000 desde el
+    emulador): desde la spec 005 lo activa build.gradle.kts para debug (research.md de
+    005, R8). Release exige HTTPS salvo que se pida al compilar.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
+</manifest>

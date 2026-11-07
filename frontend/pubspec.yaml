@@ -1,0 +1,78 @@
+# Manifiesto de la app Flutter de HandText AI (tarea T003).
+# Las versiones exactas que se usan quedan registradas en pubspec.lock
+# (constitución §2, Dependencias). Cada dependencia tiene su razón en research.md.
+name: handtext_ai
+description: "HandText AI: digitalizacion de documentos manuscritos"
+publish_to: 'none' # app privada: no se publica en pub.dev
+
+# versión visible (versionName) + número de compilación (versionCode) en Android
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Textos propios de Flutter en español (copiar, pegar, botones de diálogos).
+  flutter_localizations:
+    sdk: flutter
+  # Elegir una imagen de la galería o tomar una fotografía (Historias 1 y 2).
+  image_picker: ^1.2.2
+  # Pedir el permiso de cámara y saber si fue denegado (Historia 2).
+  # Versión fija: la 13.x usa una parte Android que exige el Android Gradle Plugin 9,
+  # incompatible con las herramientas de Flutter 3.35 (ver tasks.md, verificación).
+  permission_handler: 12.0.1
+  # Llamadas HTTP a la API del backend (reconocer y exportar).
+  http: ^1.6.0
+  # Carpetas privadas de la app: caché (copias de trabajo) y soporte (borrador).
+  path_provider: ^2.1.5
+  # Unir y comparar rutas de archivos de forma segura.
+  path: ^1.9.1
+  # Diálogo del sistema para guardar el archivo Word o PDF (research.md, R6).
+  file_picker: ^11.0.3
+  # Sesión cifrada con el Android Keystore (spec 002; research.md de 002, R7).
+  flutter_secure_storage: ^10.3.4
+  # Recortar y girar la imagen con el editor nativo uCrop (spec 003; research.md de
+  # 003, R6). Versión fija: la 13.x exige Flutter 3.47.
+  image_cropper: 12.2.1
+  # Compartir el documento guardado con el selector de Android (spec 003; research.md
+  # de 003, R7). Versión fija: la 13.x exige Flutter 3.38.
+  share_plus: 12.0.2
+  # Escáner de documentos de Google ML Kit: bordes, enderezado y filtros (spec 009;
+  # research.md de 009, R1). Versión fija: la 0.7.0 exige un Flutter más nuevo.
+  google_mlkit_document_scanner: 0.5.0
+  # Bloqueo con huella, rostro o el bloqueo de pantalla del teléfono (spec 011;
+  # research.md de 011, R1). La huella la verifica Android; la app no la recibe.
+  local_auth: 3.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Pruebas de punta a punta en el emulador (spec 012; research.md de 012, R1). Viene
+  # con Flutter: no tiene versión propia.
+  integration_test:
+    sdk: flutter
+  # Reglas recomendadas del analizador (se activan en analysis_options.yaml).
+  flutter_lints: ^5.0.0
+
+flutter:
+  # Incluye los íconos de Material Design que usan las pantallas.
+  uses-material-design: true
+
+  # Licencia de Poppins: se muestra en «Licencias» (spec 005, SC-503).
+  assets:
+    - assets/fonts/OFL-Poppins.txt
+
+  # Tipografía Poppins del estilo Aurora (licencia OFL en assets/fonts/OFL-Poppins.txt).
+  # Va incluida en la app: no se descarga nada al usarla.
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700

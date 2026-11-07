@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spec 011 (research.md de 011, R1): local_auth pide temas AppCompat hasta Android 8
+         para que el cuadro de la huella no falle. AppCompat ya viene con uCrop (spec 003). -->
+    <!-- Tema de la ventana mientras la app arranca, con el modo oscuro del
+         teléfono apagado. -->
+    <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Fondo de arranque (drawable/launch_background.xml). Se quita solo
+             cuando Flutter dibuja su primer cuadro. -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+    <!-- Tema de la ventana cuando la app ya arrancó: su color se ve mientras
+         Flutter prepara la primera pantalla y queda detrás de la interfaz. -->
+    <style name="NormalTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/launch_background</item>
+    </style>
+</resources>

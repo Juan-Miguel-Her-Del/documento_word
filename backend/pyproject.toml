@@ -1,0 +1,31 @@
+# Configuración del backend de HandText AI (tarea T001).
+#
+# - [project]: datos básicos del paquete. Las versiones exactas de las dependencias
+#   están en requirements.txt y requirements-dev.txt (constitución §2, Dependencias).
+# - [tool.ruff]: formateador y analizador de estilo. La constitución §4 exige que el
+#   código pase el formateador y el analizador configurados.
+# - [tool.pytest.ini_options]: cómo se ejecutan las pruebas automatizadas (constitución §6).
+
+[project]
+name = "handtext-backend"
+version = "0.1.0"
+description = "API de HandText AI: reconocimiento de manuscritos y exportación a Word y PDF"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/W: estilo PEP 8 · F: errores (variables sin usar, etc.) · I: orden de imports
+# UP: sintaxis moderna · B: errores comunes · N: nombres (PEP 8) · SIM: simplificaciones
+select = ["E", "W", "F", "I", "UP", "B", "N", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = [
+    # Starlette 1.x avisa que su cliente de pruebas migrará de httpx a httpx2.
+    # Solo afecta a las pruebas; la API no usa ese cliente.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]

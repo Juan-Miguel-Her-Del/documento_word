@@ -1,0 +1,62 @@
+<!--
+  Manifiesto principal de Android de HandText AI (tareas T016 y T048).
+  Cambios respecto al que genera `flutter create`:
+  - INTERNET: la app habla con la API para reconocer y exportar.
+  - CAMERA: Historia 2 (tomar la fotografía); el permiso se pide al usarla.
+  - allowBackup="false" y dataExtractionRules: el borrador del texto y las copias de
+    trabajo NO se copian a la nube ni a otro teléfono (Clarifications del spec y
+    constitución §3, Privacidad).
+  - label: nombre visible de la app.
+  - UCropActivity: editor nativo de recorte y giro (spec 003; research.md de 003, R6).
+  - usesCleartextTraffic: lo decide Gradle según el tipo de compilación (spec 005,
+    research.md R8): debug lo permite; release, solo si se pide al compilar.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <application
+        android:label="HandText AI"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:usesCleartextTraffic="${usesCleartextTraffic}">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Tema que Android muestra mientras Flutter arranca. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- Editor de recorte y giro (image_cropper / uCrop), spec 003. -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <!-- Lo usa Flutter para registrar los plugins. No borrar. -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+    <!-- Lo usa el motor de Flutter para las acciones de texto del sistema. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>
