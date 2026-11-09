@@ -16,7 +16,7 @@ from fastapi.responses import Response
 from pydantic import ValidationError
 from starlette.concurrency import run_in_threadpool
 
-from app.api.auth import CurrentUser
+from app.api.auth import DocumentUser
 from app.api.request_body import read_body_limited
 from app.config import MAX_EXPORT_BODY_BYTES
 from app.errors import AppError, ErrorCode, request_id_of
@@ -51,10 +51,10 @@ _EXPORT_BODY = {
         }
     },
 )
-async def create_export(request: Request, user: CurrentUser) -> Response:
+async def create_export(request: Request, user: DocumentUser) -> Response:
     """Genera el archivo con el texto recibido (la última versión confirmada en la app).
 
-    [SC-202] `user: CurrentUser` exige una sesión válida (spec 002).
+    Requiere sesión normal o el secreto local de desarrollo configurado explícitamente.
     """
     raw_body = await read_body_limited(request, MAX_EXPORT_BODY_BYTES, ErrorCode.TEXT_TOO_LARGE)
     try:

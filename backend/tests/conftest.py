@@ -68,6 +68,7 @@ def make_client(
     provider: OcrProvider | None,
     *,
     authenticated: bool = True,
+    local_dev_token: str | None = None,
     store: UserStore | None = None,
     clock: Callable[[], datetime] | None = None,
 ) -> TestClient:
@@ -77,13 +78,18 @@ def make_client(
     - authenticated=True registra una cuenta y envía su token en cada solicitud.
     """
     app = create_app(
-        settings=Settings(google_vision_api_key=None),
+        settings=Settings(
+            google_vision_api_key=None,
+            local_dev_token=local_dev_token,
+        ),
         ocr_provider=provider,
         user_store=store if store is not None else InMemoryUserStore(),
         password_service=FAST_PASSWORDS,
         clock=clock,
     )
     client = TestClient(app)
+    if local_dev_token:
+        client.headers["X-HandText-Local-Dev"] = local_dev_token
     if authenticated:
         grant = app.state.accounts.register(
             display_name="Persona de prueba",

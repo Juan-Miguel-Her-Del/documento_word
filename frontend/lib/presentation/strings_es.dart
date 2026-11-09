@@ -36,8 +36,9 @@ class AppStringsEs extends AppStrings {
   String get haveAccount => 'Ya tengo cuenta';
   @override
   String get welcomePrivacyNote =>
-      'Sus imágenes solo se envían con su autorización y no se guardan en el '
-      'servidor.';
+      'Sus imágenes solo se envían a la API de reconocimiento cuando lo autoriza '
+      'y no se guardan en el servidor. El reconocimiento y la generación de '
+      'Word/PDF requieren conexión con el backend. El OCR usa Google Vision.';
   @override
   String get back => 'Volver';
 
@@ -51,7 +52,9 @@ class AppStringsEs extends AppStrings {
   String get registerTitle => 'Cree su cuenta';
   @override
   String get registerSubtitle =>
-      'Solo necesita su nombre, su correo y una contraseña.';
+      'Su cuenta se guarda cifrada en este teléfono. No se sincroniza ni se '
+      'recupera desde otro dispositivo. El reconocimiento y la exportación '
+      'requieren conexión con el backend. El OCR usa Google Vision.';
   @override
   String get nameLabel => 'Nombre';
   @override
@@ -76,8 +79,8 @@ class AppStringsEs extends AppStrings {
   String get haveAccountQuestion => '¿Ya tiene cuenta?';
   @override
   String get dataPolicyConsent =>
-      'Autorizo a HandText AI a tratar mi nombre y mi correo para crear y usar mi '
-      'cuenta.';
+      'Acepto guardar mi nombre y correo cifrados en este teléfono para crear y '
+      'usar mi cuenta local.';
 
   /// Nivel de seguridad de la contraseña (0 débil, 1 aceptable, 2 fuerte).
   @override
@@ -745,6 +748,9 @@ class AppStringsEs extends AppStrings {
     FailureKind.accountsUnavailable =>
       'El servicio de cuentas no está disponible en este momento. Inténtelo '
           'más tarde.',
+    FailureKind.backendAuthenticationRequired =>
+      'La API local rechazó la solicitud. Compruebe que esté iniciada y que el '
+          'secreto de prueba coincida. Su cuenta local sigue activa.',
     FailureKind.imageEditFailed =>
       'No se pudo recortar la imagen. Se conserva la imagen anterior.',
     FailureKind.shareFailed =>

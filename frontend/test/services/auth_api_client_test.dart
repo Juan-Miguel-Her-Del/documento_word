@@ -153,4 +153,61 @@ void main() {
       expect(kind, FailureKind.sessionExpired); // [CU-H2-E5]
     },
   );
+
+  test(
+    'un 401 sin token informa que el backend requiere otra sesión',
+    () async {
+      late http.Request sent;
+      final documents = HandTextApiClient(
+        baseUrl: Uri.parse('http://api.test/'),
+        httpClient: MockClient((request) async {
+          sent = request;
+          return _error('UNAUTHENTICATED', 401);
+        }),
+      );
+
+      final kind = await _failureOf(
+        documents.recognize(fakePngBytes(), ImageFormat.png),
+      );
+
+      expect(sent.headers.containsKey('authorization'), isFalse);
+      expect(kind, FailureKind.backendAuthenticationRequired);
+    },
+  );
+
+  test(
+    'el secreto de desarrollo local se envía solo al cliente de documentos',
+    () async {
+      late http.Request sent;
+      final documents = HandTextApiClient(
+        baseUrl: Uri.parse('http://api.test/'),
+        localDevToken: 'secret-local',
+        httpClient: MockClient((request) async {
+          sent = request;
+          return _json({'status': 'text_found', 'text': 'Hola'}, 200);
+        }),
+      );
+
+      await documents.recognize(fakePngBytes(), ImageFormat.png);
+
+      expect(sent.headers['x-handtext-local-dev'], 'secret-local');
+      expect(sent.headers.containsKey('authorization'), isFalse);
+    },
+  );
+
+  test(
+    'un secreto local rechazado no se confunde con sesión vencida',
+    () async {
+      final documents = HandTextApiClient(
+        baseUrl: Uri.parse('http://api.test/'),
+        localDevToken: 'secret-local',
+        httpClient: MockClient((_) async => _error('UNAUTHENTICATED', 401)),
+      );
+
+      expect(
+        await _failureOf(documents.recognize(fakePngBytes(), ImageFormat.png)),
+        FailureKind.backendAuthenticationRequired,
+      );
+    },
+  );
 }

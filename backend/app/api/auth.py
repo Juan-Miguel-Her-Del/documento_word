@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import hmac
 import logging
 from typing import Annotated
 
@@ -61,8 +62,28 @@ def require_user(request: Request) -> UserRecord:
     return get_accounts(request).authenticate(bearer_token(request))
 
 
+def require_document_user(request: Request) -> UserRecord:
+    """Autentica documentos con una cuenta normal o el secreto local opt-in."""
+    if request.headers.get("authorization"):
+        return require_user(request)
+
+    expected = request.app.state.local_dev_token
+    supplied = request.headers.get("x-handtext-local-dev", "")
+    if expected and hmac.compare_digest(supplied, expected):
+        return UserRecord(
+            id="local-development",
+            email="local-development@invalid",
+            display_name="Local development",
+            password_hash="",
+            failed_login_attempts=0,
+            locked_until=None,
+        )
+    raise AppError(ErrorCode.UNAUTHENTICATED)
+
+
 # Forma de pedir la cuenta en una ruta:  def ruta(user: CurrentUser): ...
 CurrentUser = Annotated[UserRecord, Depends(require_user)]
+DocumentUser = Annotated[UserRecord, Depends(require_document_user)]
 
 
 def _json_body(model: type[BaseModel]) -> dict:

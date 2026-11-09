@@ -20,7 +20,7 @@ import logging
 from fastapi import APIRouter, Request
 from starlette.concurrency import run_in_threadpool
 
-from app.api.auth import CurrentUser
+from app.api.auth import DocumentUser
 from app.api.request_body import read_body_limited
 from app.config import MAX_IMAGE_BYTES
 from app.errors import AppError, ErrorCode, request_id_of
@@ -55,10 +55,10 @@ _IMAGE_BODY = {
     summary="Reconocer el texto manuscrito de una imagen",
     openapi_extra=_IMAGE_BODY,
 )
-async def create_recognition(request: Request, user: CurrentUser) -> RecognitionResponse:
+async def create_recognition(request: Request, user: DocumentUser) -> RecognitionResponse:
     """Valida la imagen, la reconoce con el proveedor y devuelve el texto sin modificarlo.
 
-    [SC-202] `user: CurrentUser` exige una sesión válida antes de leer la imagen (spec 002).
+    Requiere sesión normal o el secreto local de desarrollo configurado explícitamente.
     """
     image_bytes = await read_body_limited(request, MAX_IMAGE_BYTES, ErrorCode.IMAGE_TOO_LARGE)
     # Pillow trabaja con la CPU; se ejecuta en un hilo aparte para no bloquear la API.

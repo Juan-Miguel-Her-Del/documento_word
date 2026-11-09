@@ -55,11 +55,12 @@ MAX_AUTH_BODY_BYTES = 16 * 1024  # 16 KB: los formularios de cuenta son pequeño
 # Nombres de las variables de entorno con los secretos de la API.
 GOOGLE_VISION_API_KEY_ENV = "HANDTEXT_GOOGLE_VISION_API_KEY"
 DATABASE_URL_ENV = "HANDTEXT_DATABASE_URL"
+LOCAL_DEV_TOKEN_ENV = "HANDTEXT_LOCAL_DEV_TOKEN"
 
 
 @dataclass(frozen=True)
 class Settings:
-    """Valores que dependen del entorno donde corre la API (no del código)."""
+    """Valores del entorno donde corre la API; los secretos no se guardan en código."""
 
     # Clave de Google Cloud Vision. Si falta, el reconocimiento responde 503
     # OCR_NOT_CONFIGURED en lugar de fallar de forma confusa.
@@ -68,10 +69,20 @@ class Settings:
     # postgresql://handtext:clave@localhost:5432/handtext. Si falta, las cuentas
     # responden 503 ACCOUNTS_UNAVAILABLE.
     database_url: str | None = None
+    # Secreto opt-in para probar OCR y exportación con cuentas guardadas en el teléfono.
+    # No debe configurarse en una API accesible públicamente.
+    local_dev_token: str | None = None
 
     @classmethod
     def from_environment(cls) -> Settings:
         """Lee la configuración desde las variables de entorno del proceso."""
         key = os.environ.get(GOOGLE_VISION_API_KEY_ENV, "").strip()
         database_url = os.environ.get(DATABASE_URL_ENV, "").strip()
-        return cls(google_vision_api_key=key or None, database_url=database_url or None)
+        local_dev_token = os.environ.get(LOCAL_DEV_TOKEN_ENV, "").strip()
+        if local_dev_token and len(local_dev_token) < 32:
+            raise ValueError(f"{LOCAL_DEV_TOKEN_ENV} debe tener al menos 32 caracteres.")
+        return cls(
+            google_vision_api_key=key or None,
+            database_url=database_url or None,
+            local_dev_token=local_dev_token or None,
+        )

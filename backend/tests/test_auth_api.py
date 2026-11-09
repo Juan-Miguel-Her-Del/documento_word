@@ -151,6 +151,48 @@ def test_authenticated_recognition_still_works() -> None:
     assert response.json()["text"] == "Hola"
 
 
+def test_local_dev_token_allows_documents_without_enabling_account_access() -> None:
+    token = "local-test-secret-" + "x" * 40
+    app = create_app(
+        settings=Settings(
+            google_vision_api_key=None,
+            local_dev_token=token,
+        ),
+        ocr_provider=FakeOcrProvider(text="Hola"),
+    )
+    client = TestClient(app)
+    client.headers["X-HandText-Local-Dev"] = token
+
+    recognition = client.post(
+        "/api/v1/recognitions",
+        content=make_image_bytes(800, 600),
+        headers={"Content-Type": "image/png"},
+    )
+    export = client.post("/api/v1/exports", json={"text": "Hola", "format": "docx"})
+    account = client.get("/api/v1/auth/me")
+
+    assert recognition.status_code == 200
+    assert export.status_code == 200
+    assert export.headers["Cache-Control"] == "no-store"
+    assert account.status_code == 503
+    assert _code(account) == "ACCOUNTS_UNAVAILABLE"
+
+
+def test_local_dev_token_is_disabled_by_default() -> None:
+    client = make_client(FakeOcrProvider(text="Hola"), authenticated=False)
+
+    response = client.post(
+        "/api/v1/recognitions",
+        content=make_image_bytes(800, 600),
+        headers={
+            "Content-Type": "image/png",
+            "X-HandText-Local-Dev": "local-test-secret-" + "x" * 40,
+        },
+    )
+
+    assert response.status_code == 401
+
+
 def test_logout_invalidates_the_session() -> None:
     """[CU-H2-E1]"""
     client = make_client(FakeOcrProvider())

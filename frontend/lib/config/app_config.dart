@@ -26,6 +26,11 @@ abstract final class AppConfig {
     ),
   );
 
+  /// Secreto de uso exclusivo para desarrollo local; vacío por defecto.
+  static const String localDevApiToken = String.fromEnvironment(
+    'LOCAL_DEV_API_TOKEN',
+  );
+
   /// Tiempo máximo de espera del reconocimiento (SC-009).
   static const Duration recognitionTimeout = Duration(seconds: 60);
 

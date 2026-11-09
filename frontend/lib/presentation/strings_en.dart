@@ -36,8 +36,9 @@ class AppStringsEn extends AppStrings {
   String get haveAccount => 'I already have an account';
   @override
   String get welcomePrivacyNote =>
-      'Your images are only sent with your permission and are not stored on the '
-      'server.';
+      'Your images are only sent to the recognition API with your permission and '
+      'are not stored on the server. Recognition and Word/PDF generation require '
+      'a backend connection. OCR uses Google Vision.';
   @override
   String get back => 'Back';
 
@@ -50,7 +51,9 @@ class AppStringsEn extends AppStrings {
   String get registerTitle => 'Create your account';
   @override
   String get registerSubtitle =>
-      'All you need is your name, your email and a password.';
+      'Your account is stored securely on this phone. It is not synced or '
+      'recoverable from another device. Recognition and export require a backend '
+      'connection. OCR uses Google Vision.';
   @override
   String get nameLabel => 'Name';
   @override
@@ -75,8 +78,8 @@ class AppStringsEn extends AppStrings {
   String get haveAccountQuestion => 'Already have an account?';
   @override
   String get dataPolicyConsent =>
-      'I authorize HandText AI to process my name and email to create and use my '
-      'account.';
+      'I agree to store my name and email encrypted on this phone to create and '
+      'use my local account.';
 
   /// Nivel de seguridad de la contraseña (0 débil, 1 aceptable, 2 fuerte).
   @override
@@ -729,6 +732,9 @@ class AppStringsEn extends AppStrings {
     FailureKind.sessionExpired => 'Your session expired. Sign in again.',
     FailureKind.accountsUnavailable =>
       'The account service is not available right now. Try again later.',
+    FailureKind.backendAuthenticationRequired =>
+      'The local API rejected the request. Check that it is running and that the '
+          'test secret matches. Your local account is still active.',
     FailureKind.imageEditFailed =>
       'The image could not be cropped. The previous image is kept.',
     FailureKind.shareFailed => 'The share menu could not be opened. Try again.',

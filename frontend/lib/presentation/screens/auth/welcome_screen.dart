@@ -36,8 +36,10 @@ class WelcomeScreen extends StatelessWidget {
   /// Sesión: de ella sale el aviso que se muestra (sesión cerrada, vencida o cuenta
   /// eliminada).
   final AuthController auth;
+
   /// Abre el registro.
   final VoidCallback onCreateAccount;
+
   /// Abre el ingreso.
   final VoidCallback onSignIn;
 
@@ -45,6 +47,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final notice = auth.notice;
+    final failure = auth.failure;
     return AuroraScaffold(
       body: ListView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -87,11 +90,13 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          if (notice != null) ...[
+          if (notice != null || failure != null) ...[
             StatusBanner(
-              status: notice == StatusEvent.accountDeleted
-                  ? OperationStatus.success(notice)
-                  : OperationStatus.info(notice),
+              status: failure != null
+                  ? OperationStatus.failure(failure)
+                  : notice == StatusEvent.accountDeleted
+                  ? OperationStatus.success(notice!)
+                  : OperationStatus.info(notice!),
               onAurora: true,
             ),
             const SizedBox(height: 16),

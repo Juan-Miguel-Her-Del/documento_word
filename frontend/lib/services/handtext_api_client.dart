@@ -32,19 +32,23 @@ class HandTextApiClient implements HandTextApi {
   HandTextApiClient({
     required Uri baseUrl,
     String? Function()? tokenProvider,
+    String localDevToken = AppConfig.localDevApiToken,
     http.Client? httpClient,
     Duration recognitionTimeout = AppConfig.recognitionTimeout,
     Duration exportTimeout = AppConfig.exportTimeout,
   }) : _baseUrl = baseUrl,
        _tokenProvider = tokenProvider,
+       _localDevToken = localDevToken,
        _client = httpClient ?? http.Client(),
        _recognitionTimeout = recognitionTimeout,
        _exportTimeout = exportTimeout;
 
   final Uri _baseUrl;
 
-  /// Devuelve el token de la sesión actual (lo entrega AuthController).
+  /// Devuelve el token del backend, si existe. Las cuentas locales no emiten uno válido
+  /// para los endpoints remotos de documentos.
   final String? Function()? _tokenProvider;
+  final String _localDevToken;
   final http.Client _client;
   final Duration _recognitionTimeout;
   final Duration _exportTimeout;
@@ -52,6 +56,9 @@ class HandTextApiClient implements HandTextApi {
   /// Cabecera de autenticación [SC-202] más las cabeceras propias de la solicitud.
   Map<String, String> _headers(Map<String, String> extra) {
     final token = _tokenProvider?.call();
+    if (token == null && _localDevToken.isNotEmpty) {
+      return {'X-HandText-Local-Dev': _localDevToken, ...extra};
+    }
     return {if (token != null) 'Authorization': 'Bearer $token', ...extra};
   }
 
@@ -73,7 +80,7 @@ class HandTextApiClient implements HandTextApi {
       timeoutFailure: FailureKind.recognitionTimeout,
     );
     if (response.statusCode != 200) {
-      throw failureFromResponse(
+      throw _failureFromResponse(
         response,
         fallback: FailureKind.recognitionFailed,
       );
@@ -93,7 +100,7 @@ class HandTextApiClient implements HandTextApi {
       timeoutFailure: FailureKind.exportTimeout,
     );
     if (response.statusCode != 200) {
-      throw failureFromResponse(response, fallback: FailureKind.exportFailed);
+      throw _failureFromResponse(response, fallback: FailureKind.exportFailed);
     }
     final bytes = response.bodyBytes;
     // SC-001: lo recibido debe ser de verdad un .docx o un .pdf.
@@ -101,6 +108,17 @@ class HandTextApiClient implements HandTextApi {
       throw const AppFailure(FailureKind.exportFailed);
     }
     return bytes;
+  }
+
+  AppFailure _failureFromResponse(
+    http.Response response, {
+    required FailureKind fallback,
+  }) {
+    final failure = failureFromResponse(response, fallback: fallback);
+    if (_tokenProvider == null && failure.kind == FailureKind.sessionExpired) {
+      return const AppFailure(FailureKind.backendAuthenticationRequired);
+    }
+    return failure;
   }
 
   /// Interpreta la respuesta 200 del reconocimiento.

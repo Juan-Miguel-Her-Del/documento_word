@@ -100,6 +100,7 @@ def create_app(
     # rutas de cuentas y las protegidas responden 503 ACCOUNTS_UNAVAILABLE.
     if user_store is None and settings.database_url is not None:
         user_store = PostgresUserStore.connect(settings.database_url)
+    app.state.local_dev_token = settings.local_dev_token
     app.state.user_store = user_store
     app.state.accounts = (
         AccountService(user_store, passwords=password_service, now=clock)

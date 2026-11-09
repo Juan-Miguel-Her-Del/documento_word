@@ -50,7 +50,7 @@ class AuthController extends ChangeNotifier {
   /// Aviso para la bienvenida: sesión vencida, sesión cerrada o cuenta eliminada.
   StatusEvent? get notice => _notice;
 
-  /// Al abrir la app: [CU-H1-E9] si hay una sesión guardada, se comprueba con la API.
+  /// Al abrir la app, comprueba la sesión guardada con el servicio de autenticación.
   Future<void> initialize() async {
     StoredSession? stored;
     try {
@@ -77,9 +77,14 @@ class AuthController extends ChangeNotifier {
         _session = null;
         _status = AuthStatus.signedOut;
         _notice = StatusEvent.sessionExpired;
-      } else {
+      } else if (failure.kind == FailureKind.noConnection) {
         // Caso límite de la spec 002: sin conexión se entra con los datos guardados.
         _status = AuthStatus.signedIn;
+      } else {
+        await _clearQuietly();
+        _session = null;
+        _status = AuthStatus.signedOut;
+        _failure = failure;
       }
     }
     _notify();
@@ -111,9 +116,10 @@ class AuthController extends ChangeNotifier {
     _notify();
     try {
       final result = await request();
-      _session = StoredSession(token: result.token, user: result.user);
-      // [CU-H1-E9] Guardada en el almacenamiento seguro: sobrevive al cierre de la app.
-      await _saveQuietly(_session!);
+      final session = StoredSession(token: result.token, user: result.user);
+      // [CU-H1-E9] La sesión debe persistirse antes de entrar.
+      await _sessions.save(session);
+      _session = session;
       _status = AuthStatus.signedIn;
       _notice = null;
       return true;

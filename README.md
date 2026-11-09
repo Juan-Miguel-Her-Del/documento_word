@@ -38,6 +38,54 @@ construye y el código implementa sus tareas.
 
 ## Cómo ejecutarlo
 
+### Prueba local con cuentas guardadas en el teléfono
+
+No hace falta desplegar ni iniciar PostgreSQL. Las cuentas se crean en el teléfono y la
+API local solo recibe las solicitudes de reconocimiento y exportación. Para autorizar
+esas dos rutas durante el desarrollo, tanto la API como la app usan el mismo secreto
+temporal. La opción está desactivada por defecto; no la habilite en un servidor público
+ni comparta el secreto.
+
+El OCR actual usa Google Cloud Vision. Gemini Plus no proporciona una clave de API para
+este proyecto: se necesita una clave de Google Cloud con Vision API habilitada y la
+facturación/configuración correspondiente. La imagen se envía desde la API local a
+Google Vision para reconocerla; el modo local no significa OCR sin internet.
+
+1. En Google Cloud Console, crea un proyecto, habilita **Cloud Vision API** y crea una
+   API key restringida a esa API. No compartas la clave ni la incluyas en el código.
+2. En la primera terminal de PowerShell:
+
+   ```powershell
+   cd D:\Flutter2\documento_word\backend
+   $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+   $bytes = New-Object byte[] 32
+   $rng.GetBytes($bytes)
+   $env:HANDTEXT_LOCAL_DEV_TOKEN = [Convert]::ToBase64String($bytes)
+   $rng.Dispose()
+   $env:HANDTEXT_GOOGLE_VISION_API_KEY = "<tu clave de Cloud Vision>"
+   $env:HANDTEXT_LOCAL_DEV_TOKEN
+   .venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+   ```
+
+   Copia el secreto que imprimió el tercer comando. Si aún no instalaste las dependencias,
+   sigue primero el paso de instalación de la sección siguiente. Permite el puerto 8000
+   solo en la red privada de confianza; no publiques la API en internet.
+3. En otra terminal, desde `frontend`, ejecuta en el emulador:
+
+   ```powershell
+   cd D:\Flutter2\documento_word\frontend
+   flutter pub get
+   flutter run --dart-define="API_BASE_URL=http://10.0.2.2:8000/" --dart-define="LOCAL_DEV_API_TOKEN=<pega aquí el secreto>"
+   ```
+
+   En un teléfono físico, cambia `10.0.2.2` por la IP local del computador y conecta
+   ambos dispositivos a la misma Wi-Fi. El cortafuegos de Windows debe permitir el puerto
+   8000 en la red privada.
+
+El secreto solo habilita reconocimiento y exportación; no habilita registro, ingreso ni
+otras rutas de cuentas. Mantén ambas terminales locales y no uses este modo al compilar
+una versión para distribuir.
+
 Los pasos completos están en los quickstart de
 [001](specs/001-handtext-mvp/quickstart.md),
 [002](specs/002-cuentas-de-usuario/quickstart.md),
@@ -55,13 +103,15 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements-dev.txt
 $env:HANDTEXT_DATABASE_URL = "postgresql://handtext:una-clave-segura@localhost:5432/handtext"
 $env:HANDTEXT_GOOGLE_VISION_API_KEY = "<su clave>"   # sin clave, el reconocimiento responde 503
+$env:HANDTEXT_LOCAL_DEV_TOKEN = "<el mismo secreto aleatorio de la sección anterior>"
 .venv\Scripts\python -m app.persistence.migrations
 .venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 # 3. App (en otra terminal, con el emulador abierto)
 cd frontend
 flutter pub get
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/ `
+  --dart-define="LOCAL_DEV_API_TOKEN=<el mismo secreto>"
 ```
 
 **Versión final firmada** (detalles en el
